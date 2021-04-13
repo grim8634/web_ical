@@ -136,7 +136,10 @@ impl Calendar {
 
     ///Create a `Calendar` from text in memory.
     pub fn new_from_data(data: &str) -> anyhow::Result<Calendar> {
-        let text_data = data.lines().collect::<Vec<_>>();
+        //replace newlines to make multiline fields work
+        let d = data.to_string().replace("\r\n ", "");
+
+        let text_data = d.lines().collect::<Vec<_>>();
         let mut struct_even: Vec<Events> = Vec::new();
 
         let mut even_temp = Events::empty();
