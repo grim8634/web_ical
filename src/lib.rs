@@ -213,7 +213,23 @@ impl Calendar {
                     }
                     Err(_) => (),
                 },
+                "DTEND" => match convert_datetime(&value_cal, "%Y%m%dT%H%M%SZ") {
+                    Ok(val) => {
+                        even_temp.dtend = val;
+                    }
+                    Err(_) => (),
+                },
                 "DTSTART;VALUE=DATE" => {
+                    let aux_date = value_cal + "T000000Z";
+                    match convert_datetime(&aux_date, "%Y%m%dT%H%M%SZ") {
+                        Ok(val) => {
+                            even_temp.dtend = val;
+                        }
+                        Err(_) => (),
+                    }
+
+                }
+                "DTEND;VALUE=DATE" => {
                     let aux_date = value_cal + "T000000Z";
                     match convert_datetime(&aux_date, "%Y%m%dT%H%M%SZ") {
                         Ok(val) => {
@@ -221,15 +237,6 @@ impl Calendar {
                         }
                         Err(_) => (),
                     }
-
-                }
-                "DTEND;VALUE=DATE" => {
-                    let time_cal = "T002611Z";
-                    let aux_date = value_cal + time_cal;
-                    assign_if_ok!(
-                        even_temp.dtend,
-                        convert_datetime(&aux_date, "%Y%m%dT%H%M%SZ")
-                    );
                 }
                 "DTSTAMP" => {
                     assign_if_ok!(
