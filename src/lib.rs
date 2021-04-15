@@ -219,6 +219,18 @@ impl Calendar {
                     }
                     Err(_) => (),
                 },
+                "DTSTART;VALUE=DATE-TIME" => match convert_datetime(&value_cal, "%Y%m%dT%H%M%SZ") {
+                    Ok(val) => {
+                        even_temp.dtstart = val;
+                    }
+                    Err(_) => (),
+                },
+                "DTEND;VALUE=DATE-TIME" => match convert_datetime(&value_cal, "%Y%m%dT%H%M%SZ") {
+                    Ok(val) => {
+                        even_temp.dtend = val;
+                    }
+                    Err(_) => (),
+                },
                 "DTSTART;VALUE=DATE" => {
                     let aux_date = value_cal + "T000000Z";
                     match convert_datetime(&aux_date, "%Y%m%dT%H%M%SZ") {
