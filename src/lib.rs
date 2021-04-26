@@ -35,6 +35,8 @@ extern crate chrono;
 
 use anyhow::Context;
 use chrono::Utc;
+use chrono_tz::Tz;
+use chrono::TimeZone;
 use chrono::{DateTime, NaiveDateTime};
 use std::fs::File;
 use std::io;
@@ -58,6 +60,21 @@ use std::path::Path;
 fn convert_datetime(value: &str, format: &str) -> anyhow::Result<DateTime<Utc>> {
     let no_timezone_aux = NaiveDateTime::parse_from_str(value, format)?;
     Ok(DateTime::from_utc(no_timezone_aux, Utc))
+}
+
+fn convert_tz_datetime(value: &str, format: &str, tz: &str) -> anyhow::Result<DateTime<Utc>> {
+    let timezone: Tz = tz.parse().unwrap();
+    
+    let year = value[0..4].parse::<i32>().unwrap();
+    let month = value[4..6].parse::<u32>().unwrap();
+    let day = value[6..8].parse::<u32>().unwrap();
+
+    let hour = value[9..11].parse::<u32>().unwrap();
+    let minute = value[11..13].parse::<u32>().unwrap();
+    let second = value[13..15].parse::<u32>().unwrap();
+
+    let t = timezone.ymd(year, month, day).and_hms(hour, minute, second);
+    Ok(t.with_timezone(&Utc))
 }
 
 ///store all events from iCalendar.
@@ -272,7 +289,29 @@ impl Calendar {
                     struct_even.push(even_temp.clone());
                 }
                 other => {
-                    log::debug!("unhandled key: {}", other);
+                    if other.contains("DTSTART;TZID=") {
+                        let aux_date = value_cal;
+
+                        let tz = other.replace("DTSTART;TZID=","");
+                        match convert_tz_datetime(&aux_date, "%Y%m%dT%H%M%S", &tz) {
+                            Ok(val) => {
+                                even_temp.dtstart = val;
+                            }
+                            Err(_) => (),
+                        }
+                    } else if other.contains("DTEND;TZID=") {
+
+                        let aux_date = value_cal;
+                        let tz = other.replace("DTEND;TZID=","");
+                        match convert_tz_datetime(&aux_date, "%Y%m%dT%H%M%S", &tz) {
+                            Ok(val) => {
+                                even_temp.dtend = val;
+                            }
+                            Err(_) => (),
+                        }
+                    } else {
+                        log::debug!("unhandled key: {}", other);
+                    }   
                 }
             }
         }
