@@ -1,6 +1,6 @@
 [package]
 name = "web_ical"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Dayrel Negrin Hernandez <panoramicaplace@gmail.com>", "Ward Segers <w@rdsegers.be>"]
 edition = "2018"
 description = "web_ical is an esay iCalendar Rust library. It’s goals are to read and write ics web files (Google Calendar, Airbnb Calendar and more) data in a developer-friendly way."
