@@ -289,7 +289,29 @@ impl Calendar {
                     struct_even.push(even_temp.clone());
                 }
                 other => {
-                    if other.contains("DTSTART;TZID=") {
+                    // nasty hacky shite
+                    if other.contains("DTSTART;TZID=UTC;VALUE=DATE-TIME") {
+                        let aux_date = value_cal;
+
+                        let tz = other.replace("DTSTART;TZID=UTC;VALUE=DATE-TIME","UTC");
+                        match convert_tz_datetime(&aux_date, "%Y%m%dT%H%M%S", &tz) {
+                            Ok(val) => {
+                                even_temp.dtstart = val;
+                            }
+                            Err(_) => (),
+                        }
+                    } else if other.contains("DTEND;TZID=UTC;VALUE=DATE-TIME") {
+
+                        let aux_date = value_cal;
+                        let tz = other.replace("DTEND;TZID=UTC;VALUE=DATE-TIME","UTC");
+                        match convert_tz_datetime(&aux_date, "%Y%m%dT%H%M%S", &tz) {
+                            Ok(val) => {
+                                even_temp.dtend = val;
+                            }
+                            Err(_) => (),
+                        }
+                    }
+                    else if other.contains("DTSTART;TZID=") {
                         let aux_date = value_cal;
 
                         let tz = other.replace("DTSTART;TZID=","");
