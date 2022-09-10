@@ -33,7 +33,7 @@
 //! ```
 extern crate chrono;
 
-use anyhow::Context;
+use anyhow::{Context,Error};
 use chrono::Utc;
 use chrono_tz::Tz;
 use chrono::TimeZone;
@@ -63,7 +63,7 @@ fn convert_datetime(value: &str, format: &str) -> anyhow::Result<DateTime<Utc>> 
 }
 
 fn convert_tz_datetime(value: &str, format: &str, tz: &str) -> anyhow::Result<DateTime<Utc>> {
-    let timezone: Tz = tz.parse().unwrap();
+    let timezone: Tz = tz.parse().map_err(Error::msg)?;
     
     let year = value[0..4].parse::<i32>().unwrap();
     let month = value[4..6].parse::<u32>().unwrap();
